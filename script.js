@@ -1,0 +1,151 @@
+var results, os, ctry;
+var brsr = new Array();
+loadCountries();
+loadBrowsers();
+loadOSs();
+
+$(document).ready(function() {
+   fetchResults();
+   var selectors = $(".filters>select");
+   $(".filters select").change(function(e) {
+      var tempData = results;
+      //alert(e.target.text);
+
+      for (index in selectors) {
+         if (selectors[index].id == null)
+            continue;
+         tempData = filter(selectors[index].id.substr(6), selectors[index].value, tempData);
+      }
+      displayData(tempData);
+   });
+
+});
+
+function makePieChart() {
+
+   // first calculate aggregates that will be charted
+   $.each(visitsData, function(index1, visit) {
+      for (var i = 0; i < browserData.length; i++) {
+         if (visit.browser_id == browserData[i].id) {
+            browserData[i].count++;
+         }
+      }
+   });
+
+   // now display the Google pie chart
+   google.charts.setOnLoadCallback(drawPieChart);
+
+   // callback function
+   function drawPieChart() {
+      // create a data array in format expected by the chart
+      var table = [
+         ['Browser', 'Count']
+      ];
+      for (var i = 0; i < browserData.length; i++) {
+         if (browserData[i].count > 0) {
+            table.push([browserData[i].name, browserData[i].count]);
+         }
+      }
+
+      var data = google.visualization.arrayToDataTable(table);
+      var options = {
+         legend: 'none',
+         chartArea: {
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%'
+         }
+      };
+      var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+      chart.draw(data, options);
+   }
+}
+
+function filter(type, filter, data) {
+   var name;
+   var tempData = new Array();
+   if (filter == 0)
+      return data;
+   switch (type) {
+      case "OS":
+         //name = os.find(x => x.id === filter).name;
+         console.log(type);
+         for (index in data) {
+            if (data[index].os_id == filter)
+               tempData.push(data[index]);
+         }
+         break;
+
+      case "Country":
+         //name = ctry.find(x => x.id === filter).name;
+         console.log(filter);
+
+         for (index in data) {
+            if (data[index].country_code === ctry[filter - 1].iso)
+               tempData.push(data[index]);
+         }
+         break;
+
+      case "Browser":
+         //name = brsr.find(x => x.id === filter).name;
+         console.log(type);
+
+         for (index in data) {
+            if (data[index].browser_id == filter)
+               tempData.push(data[index]);
+         }
+         break;
+   }
+   return tempData;
+}
+
+function loadBrowsers() {
+   $.get("http://randyconnolly.com/funwebdev/services/visits/browsers.php").done(function(data) {
+      brsr = data;
+      for (var index in data) {
+
+         var op = $("<option value='" + String(parseInt(index) + 1) + "'>" + data[index].name + "</option>");
+         op.appendTo("#filterBrowser");
+      }
+   })
+}
+
+function fetchResults() {
+   $.get("http://randyconnolly.com/funwebdev/services/visits/visits.php?continent=EU&month=1&limit=100").done(function(data) {
+      results = data;
+      displayData(data);
+   })
+}
+
+function displayData(data) {
+   $("#visitsBody").empty();
+   for (var index in data) {
+      $("#visitsBody").append(createRow(data[index]));
+   }
+}
+
+function createRow(data) {
+   var row = "<tr><td>" + data.id + "</td><td>" + data.visit_date + "</td><td>" + data.country + "</td><td>" + data.browser + "</td><td>" + data.operatingSystem + "</td></tr>";
+   return row;
+}
+
+function loadOSs() {
+   $.get("http://randyconnolly.com/funwebdev/services/visits/os.php").done(function(data) {
+      os = data;
+      for (var index in data) {
+         var op = $("<option value='" + String(parseInt(index) + 1) + "'>" + data[index].name + "</option>");
+         op.appendTo("#filterOS");
+      }
+   })
+}
+
+function loadCountries() {
+   $.get("http://randyconnolly.com/funwebdev/services/visits/countries.php?continent=EU").done(function(data) {
+      ctry = data;
+      for (var index in data) {
+         var op = $("<option value='" + String(parseInt(index) + 1) + "'>" + data[index].name + "</option>");
+         op.appendTo("#filterCountry");
+      }
+   })
+}
