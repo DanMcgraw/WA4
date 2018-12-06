@@ -175,7 +175,7 @@ function filter(type, filter, data) {
 }
 
 function loadBrowsers() {
-   $.get("http://randyconnolly.com/funwebdev/services/visits/browsers.php").done(function(data) {
+   $.get("https://randyconnolly.com/funwebdev/services/visits/browsers.php").done(function(data) {
       brsr = data;
       for (var index in data) {
 
@@ -187,7 +187,7 @@ function loadBrowsers() {
 }
 
 function fetchResults() {
-   $.get("http://randyconnolly.com/funwebdev/services/visits/visits.php?continent=EU&month=1&limit=100").done(function(data) {
+   $.get("https://randyconnolly.com/funwebdev/services/visits/visits.php?continent=EU&month=1&limit=500").done(function(data) {
       results = data;
       displayData(data);
       makeCharts();
@@ -209,7 +209,7 @@ function createRow(data) {
 }
 
 function loadOSs() {
-   $.get("http://randyconnolly.com/funwebdev/services/visits/os.php").done(function(data) {
+   $.get("https://randyconnolly.com/funwebdev/services/visits/os.php").done(function(data) {
       os = data;
       for (var index in data) {
          var op = $("<option value='" + String(parseInt(index) + 1) + "'>" + data[index].name + "</option>");
@@ -221,7 +221,7 @@ function loadOSs() {
 }
 
 function loadCountries() {
-   $.get("http://randyconnolly.com/funwebdev/services/visits/countries.php?continent=EU").done(function(data) {
+   $.get("https://randyconnolly.com/funwebdev/services/visits/countries.php?continent=EU").done(function(data) {
       ctry = data;
       for (var index in data) {
          var op = $("<option value='" + String(parseInt(index) + 1) + "'>" + data[index].name + "</option>");
